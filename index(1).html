@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Surprise ❤️</title>
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/833/833472.png" type="image/x-icon">
+    <style>
+        body { background-color: #0b0b0b; color: white; font-family: 'Cairo', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; user-select: none; cursor: url('https://cdn-icons-png.flaticon.com/32/2107/2107845.png'), auto; }
+        .bubble-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; margin: 15px 10px; width: 85%; max-width: 400px; border: 1px solid rgba(255, 77, 77, 0.4); text-align: center; box-shadow: 0 0 20px rgba(255, 77, 77, 0.2); transition: 0.4s; position: relative; }
+        .bubble-card:hover { transform: translateY(-10px); border-color: #ff4d4d; box-shadow: 0 10px 30px rgba(255, 77, 77, 0.4); }
+        input { padding: 15px; border-radius: 50px; border: 2px solid #ff4d4d; background: none; color: white; text-align: center; outline: none; margin-bottom: 20px; font-size: 1.1rem; }
+        button { padding: 15px 30px; background: linear-gradient(45deg, #ff4d4d, #ff8080); color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; margin: 10px; }
+        img { width: 100%; border-radius: 20px; margin: 10px 0; border: 1px solid rgba(255, 77, 77, 0.3); pointer-events: none; }
+        #lock-screen, #loading-screen, #main-content, #final-step, #question-step { display: none; flex-direction: column; align-items: center; width: 100%; }
+        #lock-screen { display: flex; height: 100vh; justify-content: center; }
+        #loading-text { color: #ff4d4d; font-family: monospace; font-size: 1.2rem; }
+        .falling-heart { position: fixed; top: -20px; color: #ff4d4d; animation: fall linear infinite; z-index: 1000; }
+        @keyframes fall { to { transform: translateY(110vh); } }
+        #no-btn { position: absolute; background: #555; transition: 0.2s; }
+        #typewriter { font-size: 1.3rem; line-height: 1.8; color: #ffcccc; white-space: pre-line; }
+        /* زرار الموسيقى العائم */
+        #music-control { position: fixed; bottom: 20px; left: 20px; background: rgba(255, 77, 77, 0.3); padding: 10px; border-radius: 50%; cursor: pointer; z-index: 2000; display: none; border: 1px solid #ff4d4d; }
+        .spin { animation: spin 3s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body oncontextmenu="return false;" onclick="createHeart(event)">
+    <audio id="bgMusic" loop><source src="music.mp3" type="audio/mpeg"></audio>
+    <div id="music-control" class="spin" onclick="toggleMusic()">🎵</div>
+
+    <div id="lock-screen">
+        <div class="bubble-card">
+            <h2 style="color: #ff4d4d;">أدخلي الرمز السري ❤️</h2>
+            <input type="password" id="passInput" placeholder="Password...">
+            <button onclick="checkUnlock()">دخول</button>
+        </div>
+    </div>
+
+    <div id="loading-screen" style="height: 100vh; justify-content: center;">
+        <div class="bubble-card">
+            <div id="loading-text">Bypassing Security...</div>
+            <div style="margin-top:10px;">🔓 100% Decrypted</div>
+        </div>
+    </div>
+
+    <div id="main-content">
+        <div class="bubble-card"><h2>كل عيد حب وإنتي منورة حياتي يا قمر ❤️</h2></div>
+        <div class="bubble-card"><p>فلا هوي بعد هواك يهتوي ♥️</p><img src="hawa.jpg"></div>
+        <div class="bubble-card"><img src="extra1.jpg"></div>
+        <div class="bubble-card"><h3>ضحكتك وطن</h3></div>
+        <div class="bubble-card"><img src="couple.jpg"></div>
+        <div class="bubble-card">
+            <h3>كل يوم معاكي عيد</h3>
+            <button onclick="showFinal()" style="width: 100%;">اضغطي متستعجليش</button>
+        </div>
+    </div>
+
+    <div id="final-step">
+        <div class="bubble-card" style="margin-top: 50px;">
+            <div id="typewriter"></div>
+            <button id="nextBtn" style="display:none;" onclick="showQuestion()">كملي ❤️</button>
+        </div>
+    </div>
+
+    <div id="question-step">
+        <div class="bubble-card" style="margin-top: 100px; height: 300px;">
+            <h3>هل قبلتي الهدية البسيطة دي؟ 🥺</h3>
+            <button onclick="finalHappy()">أيوة طبعاً</button>
+            <button id="no-btn" onmouseover="moveButton()" onclick="moveButton()">لأ</button>
+        </div>
+    </div>
+
+    <script>
+        // رسالة الكونسول "للمحترفين"
+        console.log("%cNice try! But you can't hack my heart ;) - Ammar", "color: #ff4d4d; font-size: 20px; font-weight: bold;");
+
+        // حماية المفاتيح
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) || (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))) return false;
+        };
+
+        const text = "تغيب الشمس والناس تنام...\nويغيب القمر ويزيد الظلام...\nولكن تغيب أنت هذا حرام ❤️";
+        let i = 0;
+
+        function checkUnlock() {
+            if (document.getElementById('passInput').value === "10") {
+                document.getElementById('lock-screen').style.display = 'none';
+                document.getElementById('loading-screen').style.display = 'flex';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'flex';
+                    document.getElementById('music-control').style.display = 'block';
+                    toggleMusic(); // محاولة التشغيل
+                    startHearts();
+                }, 2000);
+            } else { alert("الرمز غلط 😉"); }
+        }
+
+        function toggleMusic() {
+            const m = document.getElementById('bgMusic');
+            m.paused ? m.play() : m.pause();
+        }
+
+        function typeWriter() {
+            if (i < text.length) {
+                document.getElementById("typewriter").innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            } else { document.getElementById("nextBtn").style.display = "inline-block"; }
+        }
+
+        function showFinal() {
+            document.getElementById('main-content').style.display = 'none';
+            document.getElementById('final-step').style.display = 'flex';
+            typeWriter();
+        }
+
+        function showQuestion() {
+            document.getElementById('final-step').style.display = 'none';
+            document.getElementById('question-step').style.display = 'flex';
+        }
+
+        function moveButton() {
+            const x = Math.random() * (window.innerWidth - 100);
+            const y = Math.random() * (window.innerHeight - 100);
+            const btn = document.getElementById('no-btn');
+            btn.style.position = 'fixed'; btn.style.left = x + 'px'; btn.style.top = y + 'px';
+        }
+
+        function finalHappy() {
+            alert("كنت عارف إنك هتقبليها.. كل عيد حب وإنتي معايا ❤️");
+        }
+
+        function startHearts() {
+            setInterval(() => {
+                const h = document.createElement('div'); h.innerHTML = '❤️'; h.classList.add('falling-heart');
+                h.style.left = Math.random() * 100 + 'vw'; h.style.animationDuration = Math.random() * 3 + 2 + 's';
+                document.body.appendChild(h); setTimeout(() => h.remove(), 5000);
+            }, 300);
+        }
+
+        // تأثير انفجار القلوب عند الضغط
+        function createHeart(e) {
+            const h = document.createElement('div');
+            h.innerHTML = '❤️';
+            h.style.position = 'fixed';
+            h.style.left = e.clientX + 'px';
+            h.style.top = e.clientY + 'px';
+            h.style.pointerEvents = 'none';
+            h.style.transition = '0.8s';
+            h.style.opacity = '1';
+            document.body.appendChild(h);
+            setTimeout(() => {
+                h.style.transform = `translateY(-50px) scale(2)`;
+                h.style.opacity = '0';
+            }, 10);
+            setTimeout(() => h.remove(), 800);
+        }
+    </script>
+</body>
+</html>
